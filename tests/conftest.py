@@ -20,3 +20,15 @@ try:
     import requests  # noqa: F401
 except ImportError:
     pass
+
+
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _no_browser(monkeypatch):
+    """Never launch a real browser: map_preview.preview() opens a temp HTML
+    file via webbrowser.open when called without output_dir, and route-planner
+    tests reach it through plan_route."""
+    import webbrowser
+    monkeypatch.setattr(webbrowser, "open", lambda *a, **k: True)
