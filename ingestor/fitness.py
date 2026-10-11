@@ -1390,4 +1390,17 @@ def recalculate_fitness(conn):
     except Exception as e:
         print(f"[fitness] Climb detection failed (non-fatal): {e}")
 
+    # Step 8c: Climb segments — must run after 8b (seeds from detected climbs)
+    print("[fitness] Matching climb segments...")
+    try:
+        from segments import discover_segments, match_efforts
+        created = discover_segments(conn)
+        if created:
+            print(f"[fitness] Discovered {created} new climb segments")
+        stored = match_efforts(conn)
+        if stored:
+            print(f"[fitness] Stored {stored} climb segment efforts")
+    except Exception as e:
+        print(f"[fitness] Climb segment matching failed (non-fatal): {e}")
+
     print(f"[fitness] Calculated {count} days of fitness data (CTL={ctl:.1f}, ATL={atl:.1f}, TSB={ctl-atl:.1f})")

@@ -25,6 +25,12 @@
       "url": "/d/velomate-activity/activity-details",
       "type": "link",
       "icon": "dashboard"
+    },
+    {
+      "title": "Climbs",
+      "url": "/d/velomate-climbs/climbs",
+      "type": "link",
+      "icon": "dashboard"
     }
   ],
   "templating": {

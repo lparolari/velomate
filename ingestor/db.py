@@ -173,6 +173,48 @@ def create_schema(conn):
 
             CREATE INDEX IF NOT EXISTS idx_ride_climbs_activity_id ON ride_climbs(activity_id);
 
+            -- Recurring climbs matched across rides (see ingestor/segments.py).
+            -- name is user-set (segments.py rename) and wins over auto_name.
+            CREATE TABLE IF NOT EXISTS climb_segments (
+                id          SERIAL PRIMARY KEY,
+                name        TEXT,
+                auto_name   TEXT NOT NULL,
+                start_lat   DOUBLE PRECISION NOT NULL,
+                start_lng   DOUBLE PRECISION NOT NULL,
+                end_lat     DOUBLE PRECISION NOT NULL,
+                end_lng     DOUBLE PRECISION NOT NULL,
+                start_alt   INTEGER,
+                end_alt     INTEGER,
+                length_m    INTEGER,
+                gain_m      INTEGER,
+                avg_grade   FLOAT,
+                category    TEXT,
+                created_at  TIMESTAMPTZ DEFAULT NOW()
+            );
+
+            CREATE TABLE IF NOT EXISTS climb_efforts (
+                id              SERIAL PRIMARY KEY,
+                segment_id      INTEGER NOT NULL REFERENCES climb_segments(id) ON DELETE CASCADE,
+                activity_id     INTEGER NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+                start_offset    INTEGER NOT NULL,
+                end_offset      INTEGER NOT NULL,
+                elapsed_s       INTEGER NOT NULL,
+                moving_s        INTEGER,
+                avg_speed_kmh   FLOAT,
+                vam_mh          INTEGER,
+                avg_hr          INTEGER,
+                avg_power       INTEGER,
+                UNIQUE (segment_id, activity_id, start_offset)
+            );
+            CREATE INDEX IF NOT EXISTS idx_climb_efforts_activity_id ON climb_efforts(activity_id);
+
+            -- (segment, ride) pairs already matched, so each ride is scanned once.
+            CREATE TABLE IF NOT EXISTS climb_segment_scans (
+                segment_id  INTEGER NOT NULL REFERENCES climb_segments(id) ON DELETE CASCADE,
+                activity_id INTEGER NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+                PRIMARY KEY (segment_id, activity_id)
+            );
+
             CREATE INDEX IF NOT EXISTS idx_streams_power ON activity_streams(activity_id, time_offset) WHERE power IS NOT NULL;
         """)
 
@@ -579,6 +621,9 @@ def upsert_streams(conn, activity_id: int, streams: list):
     try:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM activity_streams WHERE activity_id = %s", (activity_id,))
+            # Segment efforts were timed on the old streams — re-match this ride.
+            cur.execute("DELETE FROM climb_efforts WHERE activity_id = %s", (activity_id,))
+            cur.execute("DELETE FROM climb_segment_scans WHERE activity_id = %s", (activity_id,))
             if streams:
                 psycopg2.extras.execute_values(
                     cur,
