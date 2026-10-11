@@ -400,6 +400,9 @@ Configured via `.env` file:
 | `GRAFANA_PASSWORD` | Yes | Grafana admin password |
 | `GRAFANA_PORT` | No | Host port for the Grafana UI (default `3021`) |
 | `GRAFANA_ROOT_URL` | No | Public URL if served behind a reverse proxy (default `http://localhost:3021/`) |
+| `VELOMATE_MAP_PROVIDER` | No | Basemap for the map panels: `osm` (default, OpenStreetMap, no key), `carto` / `carto-light` / `carto-dark` (need `CARTO_API_KEY` — CARTO serves "API KEY REQUIRED" tiles without one; missing key falls back to `osm`), or `custom` |
+| `CARTO_API_KEY` | No | CARTO basemaps key (carto.com/basemaps/apikey), used by the `carto*` providers |
+| `VELOMATE_MAP_TILE_URL` | No | XYZ tile URL template (`{z}/{x}/{y}`) for `VELOMATE_MAP_PROVIDER=custom`, with optional `VELOMATE_MAP_ATTRIBUTION` |
 | `POLL_INTERVAL_MINUTES` | No | How often to poll each activity source, in minutes (default `10`) |
 | `VELOMATE_MAX_HR` | No | Your max heart rate (0 = auto-estimate) |
 | `VELOMATE_FTP` | No | Your FTP in watts (0 = auto-estimate) |
