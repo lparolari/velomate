@@ -1,5 +1,6 @@
 """PostgreSQL connection, schema creation, and upsert helpers."""
 
+import math
 import os
 from datetime import datetime, timezone
 
@@ -529,10 +530,51 @@ def upsert_activity(conn, data: dict) -> tuple[int, bool]:
     return _do_insert(conn, data, now), False
 
 
+MAX_DERIVED_SPEED_KMH = 120.0  # above this a GPS-derived speed is a fix glitch, not riding
+
+
+def _haversine_m(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    a = (math.sin((p2 - p1) / 2) ** 2
+         + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lng2 - lng1) / 2) ** 2)
+    return 2 * 6371000.0 * math.asin(math.sqrt(a))
+
+
+def fill_missing_speed(streams: list) -> list:
+    """Derive speed_kmh from consecutive GPS fixes wherever a point has none.
+
+    Every downstream distance calculation (climb detection, speed panels)
+    integrates speed_kmh over time_offset, so a stream without speed — e.g.
+    phone-app recordings on Ride with GPS, which carry position and elevation
+    but no per-point speed — reads as a 0 m ride. Deriving speed as
+    Δdistance/Δt makes that integral reproduce the GPS track length exactly.
+    Recorded speed is never overwritten; points without a usable previous fix
+    (first point, missing lat/lng, non-increasing time) and implausible jumps
+    stay None. Works in place and returns the list for convenience.
+    """
+    prev = None
+    for pt in streams:
+        has_fix = pt.get("lat") is not None and pt.get("lng") is not None \
+            and pt.get("time_offset") is not None
+        if pt.get("speed_kmh") is None and has_fix and prev is not None:
+            dt = pt["time_offset"] - prev["time_offset"]
+            if dt > 0:
+                kmh = _haversine_m(prev["lat"], prev["lng"], pt["lat"], pt["lng"]) / dt * 3.6
+                if kmh <= MAX_DERIVED_SPEED_KMH:
+                    pt["speed_kmh"] = round(kmh, 2)
+        if has_fix:
+            prev = pt
+    return streams
+
+
 def upsert_streams(conn, activity_id: int, streams: list):
     """Replace streams for an activity. Wrapped in a transaction so a crash
     between DELETE and INSERT doesn't leave the activity with no streams.
+
+    Missing speed is derived from GPS first (see fill_missing_speed) so every
+    source yields a stream whose speed integrates to the ride distance.
     """
+    fill_missing_speed(streams)
     conn.autocommit = False
     try:
         with conn.cursor() as cur:
