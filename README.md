@@ -91,6 +91,8 @@ Four dashboards with 140+ panels across 12 visualization types.
 - Personal records with drill-down links
 - All-time ride map
 
+![Climbs](screenshots/climbs.png)
+
 **Climbs** (13 panels) — the same climb, compared across rides
 - Climb segments: recurring climbs found automatically (any climb detected on two or more rides) and then matched against the GPS track of *every* ride, so a climb is timed on the exact same start and end points even when it is part of a different route — Strava-style segments, computed locally with no Strava account
 - Segment list with record time, record date and last ridden; click one for its leaderboard

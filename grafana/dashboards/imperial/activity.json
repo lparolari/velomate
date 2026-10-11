@@ -987,7 +987,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
               }
             ]
           },
@@ -999,7 +999,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
               }
             ]
           },
@@ -1011,7 +1011,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
               }
             ]
           }
