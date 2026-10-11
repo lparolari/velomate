@@ -58,12 +58,12 @@ services:
       - "${GRAFANA_PORT:-3021}:3000"
     volumes:
       - velomate-grafana-data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning:z
       # Selects the generated dashboard set: metric or imperial. Use exactly
       # one of those two — any other value resolves to a nonexistent directory
       # and Grafana provisions no dashboards at all.
-      - ./grafana/dashboards/${VELOMATE_UNITS:-metric}:/etc/grafana/dashboards
-      - ./grafana/entrypoint.sh:/velomate-entrypoint.sh:ro
+      - ./grafana/dashboards/${VELOMATE_UNITS:-metric}:/etc/grafana/dashboards:z
+      - ./grafana/entrypoint.sh:/velomate-entrypoint.sh:ro,z
     # Picks the map basemap from VELOMATE_MAP_PROVIDER, then runs Grafana's
     # stock /run.sh.
     entrypoint: ["/bin/sh", "/velomate-entrypoint.sh"]
