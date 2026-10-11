@@ -46,7 +46,7 @@ Inspired by [TeslaMate](https://github.com/teslamate-org/teslamate). Works with 
 
 ### Grafana Dashboards
 
-Three dashboards with 128 panels across 12 visualization types.
+Four dashboards with 140+ panels across 12 visualization types.
 
 **Overview** (43 panels) — your training hub
 - 10 period summary stats (Rides, Distance, Elevation, Duration, TSS, Avg Power, Avg HR, Avg Speed, Avg Decoupling, Calories) with sport type filter
@@ -71,6 +71,7 @@ Three dashboards with 128 panels across 12 visualization types.
 - Per-km splits table with best/worst markers
 - Power duration curve
 - Detected intervals table (Coggan-style: sprint / anaerobic / vo2 / threshold / sweetspot / tempo)
+- Climb segment efforts on this ride, ranked against every other time you rode them (🏆 on a record)
 
 ![All Time Progression](screenshots/progression.png)
 
@@ -89,6 +90,14 @@ Three dashboards with 128 panels across 12 visualization types.
 - Annual totals table
 - Personal records with drill-down links
 - All-time ride map
+
+**Climbs** (13 panels) — the same climb, compared across rides
+- Climb segments: recurring climbs found automatically (any climb detected on two or more rides) and then matched against the GPS track of *every* ride, so a climb is timed on the exact same start and end points even when it is part of a different route — Strava-style segments, computed locally with no Strava account
+- Segment list with record time, record date and last ridden; click one for its leaderboard
+- Leaderboard: elapsed (record) and moving time, gap to record, avg speed, VAM, avg HR / power when recorded
+- Record effort on the map, time-on-segment trend with record progression, climbing pace (speed + VAM) trend
+- Segments get an automatic name (`987→1085 m · 1.0 km · 9.7%`); rename them with
+  `docker exec velomate-ingestor python3 segments.py rename <id> "Galleno → Donasè"` (`list` shows ids, an empty name restores the automatic one)
 
 ![Route Preview](screenshots/route-preview.png)
 

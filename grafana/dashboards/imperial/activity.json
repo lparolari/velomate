@@ -26,6 +26,12 @@
       "url": "/d/velomate-progression/all-time-progression",
       "type": "link",
       "icon": "dashboard"
+    },
+    {
+      "title": "Climbs",
+      "url": "/d/velomate-climbs/climbs",
+      "type": "link",
+      "icon": "dashboard"
     }
   ],
   "templating": {
@@ -899,6 +905,126 @@
       }
     },
     {
+      "id": 1501,
+      "type": "table",
+      "title": "Climb Segment Efforts",
+      "description": "Climb segments ridden on this ride, ranked against every other time you rode them (all-time).\n\nSegments are recurring climbs matched by GPS \u2014 see the Climbs dashboard for leaderboards and trends.",
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 7
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "velomate"
+      },
+      "targets": [
+        {
+          "rawSql": "WITH ranked AS (\n  SELECT e.*,\n    RANK() OVER (PARTITION BY e.segment_id ORDER BY e.elapsed_s) AS rnk,\n    COUNT(*) OVER (PARTITION BY e.segment_id) AS n,\n    MIN(e.elapsed_s) OVER (PARTITION BY e.segment_id) AS best\n  FROM climb_efforts e\n)\nSELECT r.segment_id AS \"_sid\",\n  COALESCE(s.name, s.auto_name) AS \"Segment\",\n  s.category AS \"Category\",\n  r.elapsed_s AS \"Elapsed\",\n  r.moving_s AS \"Moving\",\n  CASE WHEN r.rnk = 1 THEN '\ud83c\udfc6 Record' ELSE r.rnk || ' of ' || r.n END AS \"Rank\",\n  r.elapsed_s - r.best AS \"Gap to Record\",\n  r.vam_mh AS \"VAM\"\nFROM ranked r\nJOIN climb_segments s ON s.id = r.segment_id\nWHERE r.activity_id = ${activity_id}\nORDER BY r.start_offset;",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "No climb segments on this ride",
+          "custom": {
+            "align": "center"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_sid"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Segment"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open leaderboard",
+                    "url": "/d/velomate-climbs/climbs?var-segment=${__data.fields._sid}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Segment"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 280
+              },
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Elapsed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "clocks"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Moving"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "clocks"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gap to Record"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "clocks"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      }
+    },
+    {
       "id": 901,
       "type": "row",
       "title": "Power Quality",
@@ -907,7 +1033,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 37
       },
       "panels": []
     },
@@ -919,7 +1045,7 @@
         "h": 3,
         "w": 6,
         "x": 0,
-        "y": 24
+        "y": 38
       },
       "datasource": {
         "type": "postgres",
@@ -963,7 +1089,7 @@
         "h": 3,
         "w": 6,
         "x": 6,
-        "y": 24
+        "y": 38
       },
       "datasource": {
         "type": "postgres",
@@ -1034,7 +1160,7 @@
         "h": 3,
         "w": 6,
         "x": 12,
-        "y": 24
+        "y": 38
       },
       "datasource": {
         "type": "postgres",
@@ -1093,7 +1219,7 @@
         "h": 3,
         "w": 6,
         "x": 18,
-        "y": 24
+        "y": 38
       },
       "datasource": {
         "type": "postgres",
@@ -1133,7 +1259,7 @@
       "type": "stat",
       "gridPos": {
         "x": 0,
-        "y": 27,
+        "y": 41,
         "w": 6,
         "h": 3
       },
@@ -1176,7 +1302,7 @@
       "type": "stat",
       "gridPos": {
         "x": 6,
-        "y": 27,
+        "y": 41,
         "w": 6,
         "h": 3
       },
@@ -1246,7 +1372,7 @@
       "type": "stat",
       "gridPos": {
         "x": 12,
-        "y": 27,
+        "y": 41,
         "w": 6,
         "h": 3
       },
@@ -1306,7 +1432,7 @@
       "type": "stat",
       "gridPos": {
         "x": 18,
-        "y": 27,
+        "y": 41,
         "w": 6,
         "h": 3
       },
@@ -1362,7 +1488,7 @@
       "description": "Lowest W'bal during the ride \u2014 how close to empty your\nanaerobic battery got.\n\nComputed via Skiba differential model using the latest CP/W'\nestimate. Requires power data.",
       "gridPos": {
         "x": 0,
-        "y": 30,
+        "y": 44,
         "w": 6,
         "h": 3
       },
@@ -1414,7 +1540,7 @@
       "description": "Percentage of ride time where W'bal was below 25% of W'.\nShows how much of the ride was 'in the red.'\n\nNote: uses the latest W' estimate for the 25% threshold \u2014\na known approximation (see spec).",
       "gridPos": {
         "x": 6,
-        "y": 30,
+        "y": 44,
         "w": 6,
         "h": 3
       },
@@ -1464,7 +1590,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 47
       },
       "datasource": {
         "type": "postgres",
@@ -1543,7 +1669,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 41
+        "y": 55
       },
       "panels": []
     },
@@ -1555,7 +1681,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 56
       },
       "datasource": {
         "type": "postgres",
@@ -1675,7 +1801,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 62
       },
       "datasource": {
         "type": "postgres",
@@ -1825,7 +1951,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 54
+        "y": 68
       },
       "datasource": {
         "type": "postgres",
@@ -1947,7 +2073,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 54
+        "y": 68
       },
       "datasource": {
         "type": "postgres",
@@ -2099,7 +2225,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 62
+        "y": 76
       },
       "datasource": {
         "type": "postgres",
@@ -2230,7 +2356,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 62
+        "y": 76
       },
       "datasource": {
         "type": "postgres",
@@ -2400,7 +2526,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 84
       },
       "panels": []
     },
@@ -2412,7 +2538,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 71
+        "y": 85
       },
       "datasource": {
         "type": "postgres",
@@ -2466,7 +2592,7 @@
       "description": "How much power you retained in the second half vs the first half.\n\n100% = no fade. 90% = lost 10% of your power.\n> 100% = negative split (went harder in the back half).\n\nShows at which durations you fade most \u2014 short efforts\n(anaerobic) vs long efforts (aerobic) may differ.",
       "gridPos": {
         "x": 0,
-        "y": 79,
+        "y": 93,
         "w": 18,
         "h": 6
       },
@@ -2526,7 +2652,7 @@
       "description": "2nd-half best 5-min power / 1st-half best 5-min power.\n\n1.0 = no fade. 0.9 = 10% power drop in the back half.\n\n\ud83d\udfe2 >= 0.95 \u2014 good durability\n\n\ud83d\udfe1 0.90-0.95 \u2014 moderate fade\n\n\ud83d\udd34 < 0.90 \u2014 significant durability deficit",
       "gridPos": {
         "x": 18,
-        "y": 79,
+        "y": 93,
         "w": 6,
         "h": 6
       },
@@ -2587,7 +2713,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 85
+        "y": 99
       },
       "panels": []
     },
@@ -2599,7 +2725,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 86
+        "y": 100
       },
       "datasource": {
         "type": "postgres",
@@ -2632,7 +2758,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 94
+        "y": 108
       },
       "panels": []
     },
@@ -2644,7 +2770,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 95
+        "y": 109
       },
       "datasource": {
         "type": "postgres",
@@ -2771,7 +2897,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 105
+        "y": 119
       },
       "datasource": {
         "type": "postgres",
@@ -2924,7 +3050,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 115
+        "y": 129
       },
       "datasource": {
         "type": "postgres",
@@ -3041,7 +3167,7 @@
       "type": "trend",
       "gridPos": {
         "x": 0,
-        "y": 125,
+        "y": 139,
         "w": 24,
         "h": 10
       },
@@ -3125,7 +3251,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 135
+        "y": 149
       },
       "panels": []
     },
@@ -3137,7 +3263,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 136
+        "y": 150
       },
       "datasource": {
         "type": "postgres",
@@ -3192,7 +3318,7 @@
       "type": "stat",
       "gridPos": {
         "x": 12,
-        "y": 30,
+        "y": 44,
         "w": 6,
         "h": 3
       },
@@ -3251,7 +3377,7 @@
       "type": "stat",
       "gridPos": {
         "x": 18,
-        "y": 30,
+        "y": 44,
         "w": 6,
         "h": 3
       },
@@ -3321,7 +3447,7 @@
       "type": "stat",
       "gridPos": {
         "x": 0,
-        "y": 33,
+        "y": 47,
         "w": 6,
         "h": 3
       },
