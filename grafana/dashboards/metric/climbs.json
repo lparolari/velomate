@@ -173,7 +173,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
               }
             ]
           }
@@ -535,7 +535,7 @@
               }
             ]
           },
-          "unit": "clocks"
+          "unit": "dthms"
         }
       },
       "description": "Fastest elapsed time from the segment start to its end point."
@@ -548,7 +548,7 @@
       "gridPos": {
         "x": 0,
         "y": 14,
-        "w": 14,
+        "w": 17,
         "h": 11
       },
       "datasource": {
@@ -596,6 +596,10 @@
                     "url": "/d/velomate-activity/activity-details?var-activity_id=${__data.fields._id}"
                   }
                 ]
+              },
+              {
+                "id": "custom.width",
+                "value": 180
               }
             ]
           },
@@ -621,10 +625,6 @@
               "options": "Rank"
             },
             "properties": [
-              {
-                "id": "custom.width",
-                "value": 70
-              },
               {
                 "id": "mappings",
                 "value": [
@@ -652,6 +652,10 @@
                   "mode": "fixed",
                   "fixedColor": "text"
                 }
+              },
+              {
+                "id": "custom.width",
+                "value": 60
               }
             ]
           },
@@ -663,7 +667,11 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
+              },
+              {
+                "id": "custom.width",
+                "value": 85
               }
             ]
           },
@@ -675,7 +683,11 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
+              },
+              {
+                "id": "custom.width",
+                "value": 85
               }
             ]
           },
@@ -687,7 +699,11 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "clocks"
+                "value": "dthms"
+              },
+              {
+                "id": "custom.width",
+                "value": 110
               }
             ]
           },
@@ -700,6 +716,10 @@
               {
                 "id": "unit",
                 "value": "velocitykmh"
+              },
+              {
+                "id": "custom.width",
+                "value": 90
               }
             ]
           },
@@ -712,6 +732,14 @@
               {
                 "id": "unit",
                 "value": "bpm"
+              },
+              {
+                "id": "custom.width",
+                "value": 75
+              },
+              {
+                "id": "noValue",
+                "value": "\u2013"
               }
             ]
           },
@@ -724,6 +752,38 @@
               {
                 "id": "unit",
                 "value": "watt"
+              },
+              {
+                "id": "custom.width",
+                "value": 90
+              },
+              {
+                "id": "noValue",
+                "value": "\u2013"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Date"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "VAM"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 65
               }
             ]
           }
@@ -742,9 +802,9 @@
       "title": "Record Effort",
       "description": "The segment as ridden on your record effort, coloured by altitude (green low, red high).",
       "gridPos": {
-        "x": 14,
+        "x": 17,
         "y": 14,
-        "w": 10,
+        "w": 7,
         "h": 11
       },
       "datasource": {
@@ -805,7 +865,7 @@
       "gridPos": {
         "x": 0,
         "y": 25,
-        "w": 14,
+        "w": 17,
         "h": 9
       },
       "datasource": {
@@ -821,7 +881,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "clocks",
+          "unit": "dthms",
           "custom": {
             "drawStyle": "line",
             "lineWidth": 2,
@@ -882,9 +942,9 @@
       "title": "Climbing Pace",
       "description": "Average speed and VAM (vertical metres per hour, m/h) of every effort. Higher is better for both.\n\nUses the dashboard time range.",
       "gridPos": {
-        "x": 14,
+        "x": 17,
         "y": 25,
-        "w": 10,
+        "w": 7,
         "h": 9
       },
       "datasource": {
